@@ -1,6 +1,6 @@
 ﻿using ShoppingCart.Application.Dto;
 
-namespace ShoppingCart.Application.Interfaces
+namespace ShoppingCart.Application.Products
 {
     public interface IProducts
     {

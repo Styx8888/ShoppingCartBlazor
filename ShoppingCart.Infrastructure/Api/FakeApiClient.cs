@@ -1,7 +1,7 @@
 ﻿using Flurl.Http;
 using Flurl.Http.Configuration;
 using ShoppingCart.Application.Dto;
-using ShoppingCart.Application.Interfaces;
+using ShoppingCart.Application.Products;
 
 namespace ShoppingCart.Infrastructure.Api
 {
