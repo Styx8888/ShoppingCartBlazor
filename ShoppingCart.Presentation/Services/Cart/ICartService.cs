@@ -10,6 +10,8 @@ namespace ShoppingCart.Presentation.Services.Cart
 
         Task RemoveFromCart(int productId);
 
+        Task RemoveSingleItemFromCart(int productId);
+
         Task ClearCart();
     }
 }

@@ -1,9 +1,10 @@
 ﻿@page "/"
 @using ShoppingCart.Domain
 @using ShoppingCart.Presentation.Services
+@using ShoppingCart.Presentation.Services.Cart
 @using ShoppingCart.Presentation.Services.Products
 @inject IProductService ProductService
-@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject ICartService CartService
 
 <h3>Products</h3>
 
@@ -106,7 +107,7 @@ else
     {
         if (_cartLoaded) return;
 
-        var storedCart = await LocalStorage.GetItemAsync<List<ProductWithRecommendation>>("cart");
+        var storedCart = await CartService.GetCart();
         if (storedCart is not null)
         {
             cart = storedCart;
@@ -118,14 +119,15 @@ else
     private async Task AddToCart(ProductWithRecommendation product)
     {
         cart.Add(product);
-        await LocalStorage.SetItemAsync("cart", cart);
+        await CartService.AddToCart(product);
         StateHasChanged();
     }
 
     private async Task RemoveFromCart(int productId)
     {
-        cart.RemoveAll(p => p.Id == productId);
-        await LocalStorage.SetItemAsync("cart", cart);
+        await CartService.RemoveSingleItemFromCart(productId);
+        cart = await CartService.GetCart();
+        StateHasChanged();
         StateHasChanged();
     }
 
@@ -137,8 +139,7 @@ else
             Console.WriteLine($"- {item.Title} - ${item.Price}");
         }
 
-        cart.Clear();
-        await LocalStorage.RemoveItemAsync("cart");
+        await CartService.ClearCart();
         StateHasChanged();
     }
 

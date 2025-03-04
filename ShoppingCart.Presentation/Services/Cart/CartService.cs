@@ -36,6 +36,17 @@
         {
             await _localStorage.RemoveItemAsync(CartKey);
         }
+
+        public async Task RemoveSingleItemFromCart(int productId)
+        {
+            var cart = await GetCart();
+            var itemToRemove = cart.FirstOrDefault(p => p.Id == productId);
+            if (itemToRemove != null)
+            {
+                cart.Remove(itemToRemove);
+                await _localStorage.SetItemAsync(CartKey, cart);
+            }
+        }
     }
 
 }
