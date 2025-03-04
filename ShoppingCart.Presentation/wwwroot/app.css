@@ -55,3 +55,18 @@ h1:focus {
     gap: 10px;
     margin: 20px;
 }
+
+.page-size-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 20px;
+}
+
+    .page-size-selector select {
+        padding: 5px;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+    }

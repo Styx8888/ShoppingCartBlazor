@@ -6,6 +6,16 @@
 
 <h3>Products</h3>
 
+<div class="page-size-selector">
+    <label for="pageSize">Items per page:</label>
+    <select id="pageSize" @onchange="ChangePageSize">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+    </select>
+</div>
+
 @if (products is null)
 {
     <p>Loading...</p>
@@ -59,7 +69,7 @@ else
 @code {
     private PaginationResult<ProductWithRecommendation>? products;
     private int _currentPage = 1;
-    private const int PageSize = 5;
+    private int PageSize { get; set; } = 5;
     private int totalProducts = 0;
     private List<ProductWithRecommendation> cart = new();
     private bool _cartLoaded = false;
@@ -82,6 +92,13 @@ else
     {
         products = await ProductService.GetProductsAsync(_currentPage, PageSize);
         totalProducts = products?.TotalItems ?? 0;
+    }
+
+    private async Task ChangePageSize(ChangeEventArgs e)
+    {
+        PageSize = int.Parse(e.Value?.ToString() ?? "5");
+        _currentPage = 1;
+        await LoadProducts();
     }
 
     private async Task LoadCart()
