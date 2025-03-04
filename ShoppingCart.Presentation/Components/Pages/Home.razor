@@ -1,0 +1,63 @@
+﻿@page "/"
+@using ShoppingCart.Domain
+@using ShoppingCart.Presentation.Services
+@inject IProductService ProductService
+
+<h3>Products</h3>
+
+@if (products is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="product-grid">
+        @foreach (var product in products.Data)
+        {
+            <div class="product-card">
+                <img src="@product.Image" alt="@product.Title" />
+                <h4>@product.Title</h4>
+                <p>@product.Description</p>
+                <strong>$@product.Price</strong>
+                <p>⭐ @product.Stars</p>
+                <p>Recommended: @(product.Recommendation ? "Yes" : "No")</p>
+            </div>
+        }
+    </div>
+
+    <div class="pagination">
+        <button @onclick="PreviousPage" disabled="@(_currentPage == 1)">Previous</button>
+        <span>Page @_currentPage</span>
+        <button @onclick="NextPage" disabled="@(_currentPage * PageSize >= totalProducts)">Next</button>
+    </div>
+}
+
+@code {
+    private PaginationResult<ProductWithRecommendation>? products;
+    private int _currentPage = 1;
+    private const int PageSize = 5;
+    private int totalProducts = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        products = await ProductService.GetProductsAsync(_currentPage, PageSize);
+        totalProducts = products?.TotalItems ?? 0;
+    }
+
+    private async Task NextPage()
+    {
+        _currentPage++;
+        await LoadProducts();
+    }
+
+    private async Task PreviousPage()
+    {
+        _currentPage--;
+        await LoadProducts();
+    }
+}
