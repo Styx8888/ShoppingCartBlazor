@@ -2,7 +2,7 @@
 using Flurl.Http.Configuration;
 using ShoppingCart.Domain;
 
-namespace ShoppingCart.Presentation.Services
+namespace ShoppingCart.Presentation.Services.Products
 {
     public class ProductService : IProductService
     {

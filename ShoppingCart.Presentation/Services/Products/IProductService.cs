@@ -1,6 +1,6 @@
 ﻿using ShoppingCart.Domain;
 
-namespace ShoppingCart.Presentation.Services
+namespace ShoppingCart.Presentation.Services.Products
 {
     public interface IProductService
     {
