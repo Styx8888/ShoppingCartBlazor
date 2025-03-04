@@ -16,8 +16,17 @@ namespace ShoppingCart.Infrastructure.Api
 
         public async Task<IEnumerable<ProductDto>> GetAllProducts()
         {
-            var products = await _fakeApiClient.Request("products").GetJsonAsync<IEnumerable<ProductDto>>();
-            return products;
+            try
+            {
+                var products = await _fakeApiClient.Request("products").GetJsonAsync<IEnumerable<ProductDto>>();
+                return products;
+            }
+            catch (Exception)
+            {
+                //// TODO: Logger should log the error here, or implement some strategy for retrying
+                return Enumerable.Empty<ProductDto>();
+            }
+           
         }
     }
 }

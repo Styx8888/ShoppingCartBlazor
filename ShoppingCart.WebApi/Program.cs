@@ -18,7 +18,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache(options =>
 {
     options.CompactionPercentage = 0.2;
-    options.ExpirationScanFrequency = TimeSpan.FromMinutes(3);
+    options.ExpirationScanFrequency = TimeSpan.FromMinutes(5);
 });
 
 var fakeApiUrl = builder.Configuration.GetValue<string>("ApiSettings:FakeApiUrl");
@@ -52,15 +52,20 @@ app.MapGet("/products", async (
     [AsParameters] PaginationParams pagination) =>
 {
     var result = await productService.GetProductsWithRecommendation(pagination.Page, pagination.PageSize);
+
+    if (result.Data.Count == 0)
+    {
+        return Results.NotFound();
+    }
+
     return Results.Ok(result);
 })
 .WithName("GetProductsWithRecommendations")
 .Produces<PaginationResult<ProductWithRecommendation>>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status500InternalServerError);
+.Produces(StatusCodes.Status500InternalServerError)
+.Produces(StatusCodes.Status404NotFound);
 
 app.Run();
 
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+public partial class Program { }
+
