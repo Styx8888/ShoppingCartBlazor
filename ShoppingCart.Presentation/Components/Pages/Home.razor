@@ -3,7 +3,6 @@
 @using ShoppingCart.Presentation.Services
 @inject IProductService ProductService
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
-@inject Microsoft.JSInterop.IJSRuntime JS
 
 <h3>Products</h3>
 
@@ -63,6 +62,7 @@ else
     private const int PageSize = 5;
     private int totalProducts = 0;
     private List<ProductWithRecommendation> cart = new();
+    private bool _cartLoaded = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -71,7 +71,11 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadCart();
+        if (firstRender)
+        {
+            await LoadCart();
+            StateHasChanged();
+        }
     }
 
     private async Task LoadProducts()
@@ -82,7 +86,15 @@ else
 
     private async Task LoadCart()
     {
-        cart = await LocalStorage.GetItemAsync<List<ProductWithRecommendation>>("cart") ?? new();
+        if (_cartLoaded) return;
+
+        var storedCart = await LocalStorage.GetItemAsync<List<ProductWithRecommendation>>("cart");
+        if (storedCart is not null)
+        {
+            cart = storedCart;
+        }
+
+        _cartLoaded = true;
     }
 
     private async Task AddToCart(ProductWithRecommendation product)
@@ -109,6 +121,7 @@ else
 
         cart.Clear();
         await LocalStorage.RemoveItemAsync("cart");
+        StateHasChanged();
     }
 
     private async Task NextPage()
