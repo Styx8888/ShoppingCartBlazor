@@ -2,6 +2,8 @@
 @using ShoppingCart.Domain
 @using ShoppingCart.Presentation.Services
 @inject IProductService ProductService
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject Microsoft.JSInterop.IJSRuntime JS
 
 <h3>Products</h3>
 
@@ -21,6 +23,7 @@ else
                 <strong>$@product.Price</strong>
                 <p>⭐ @product.Stars</p>
                 <p>Recommended: @(product.Recommendation ? "Yes" : "No")</p>
+                <button @onclick="() => AddToCart(product)">Add to Cart</button>
             </div>
         }
     </div>
@@ -32,21 +35,80 @@ else
     </div>
 }
 
+<h3>Shopping Cart</h3>
+
+@if (cart.Any())
+{
+    <ul>
+        @foreach (var item in cart)
+        {
+            <li>
+                @item.Title - $@item.Price
+                <button @onclick="() => RemoveFromCart(item.Id)">Remove</button>
+            </li>
+        }
+    </ul>
+
+    <p><strong>Total Price:</strong> $@cart.Sum(p => p.Price)</p>
+    <button @onclick="BuyItems">Buy</button>
+}
+else
+{
+    <p>Your cart is empty.</p>
+}
+
 @code {
     private PaginationResult<ProductWithRecommendation>? products;
     private int _currentPage = 1;
     private const int PageSize = 5;
     private int totalProducts = 0;
+    private List<ProductWithRecommendation> cart = new();
 
     protected override async Task OnInitializedAsync()
     {
         await LoadProducts();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await LoadCart();
+    }
+
     private async Task LoadProducts()
     {
         products = await ProductService.GetProductsAsync(_currentPage, PageSize);
         totalProducts = products?.TotalItems ?? 0;
+    }
+
+    private async Task LoadCart()
+    {
+        cart = await LocalStorage.GetItemAsync<List<ProductWithRecommendation>>("cart") ?? new();
+    }
+
+    private async Task AddToCart(ProductWithRecommendation product)
+    {
+        cart.Add(product);
+        await LocalStorage.SetItemAsync("cart", cart);
+        StateHasChanged();
+    }
+
+    private async Task RemoveFromCart(int productId)
+    {
+        cart.RemoveAll(p => p.Id == productId);
+        await LocalStorage.SetItemAsync("cart", cart);
+        StateHasChanged();
+    }
+
+    private async Task BuyItems()
+    {
+        Console.WriteLine("Purchase Completed! Items:");
+        foreach (var item in cart)
+        {
+            Console.WriteLine($"- {item.Title} - ${item.Price}");
+        }
+
+        cart.Clear();
+        await LocalStorage.RemoveItemAsync("cart");
     }
 
     private async Task NextPage()

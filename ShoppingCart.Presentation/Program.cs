@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Flurl.Http.Configuration;
 using ShoppingCart.Presentation.Components;
 using ShoppingCart.Presentation.Services;
@@ -18,6 +19,7 @@ if (string.IsNullOrWhiteSpace(productsApiUrl))
 builder.Services.AddSingleton(sp => new FlurlClientCache()
     .Add("ProductsApiClient", productsApiUrl));
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
 
